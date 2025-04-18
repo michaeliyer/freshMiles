@@ -59,6 +59,15 @@ function updateAudioSources(albumNumber) {
   const config = albumConfigs[albumNumber];
   if (!config) return;
 
+  // Update background video
+  const video = document.getElementById("background-video");
+  const videoSource = video.querySelector("source");
+  if (config.backgroundVideo) {
+    videoSource.src = config.backgroundVideo.url;
+    videoSource.type = config.backgroundVideo.type;
+    video.load();
+  }
+
   document.querySelectorAll("button[data-audio]").forEach((button) => {
     const audioId = button.getAttribute("data-audio");
     const audio = document.getElementById(audioId);

@@ -54,6 +54,37 @@ const albumConfigs = {
   3: audioSources3, // config_3.js
 };
 
+// Function to create a new track element
+function createTrackElement(trackId, trackData) {
+  const template = document.getElementById("track-template");
+  const trackElement = template.content.cloneNode(true);
+
+  // Set up the track element
+  const track = trackElement.querySelector(".track");
+  const title = trackElement.querySelector(".track-title");
+  const audio = trackElement.querySelector("audio");
+  const playButton = trackElement.querySelector(".play-button");
+  const seekBar = trackElement.querySelector(".seek-bar");
+  const volumeSlider = trackElement.querySelector(".volume-slider");
+  const timeDisplay = trackElement.querySelector(".time-display");
+  const canvas = trackElement.querySelector(".visualizer");
+
+  // Set IDs and data attributes
+  audio.id = `audio${trackId}`;
+  title.id = `track-title-${trackId}`;
+  playButton.setAttribute("data-audio", `audio${trackId}`);
+  seekBar.setAttribute("data-seek", `audio${trackId}`);
+  volumeSlider.setAttribute("data-volume", `audio${trackId}`);
+  canvas.setAttribute("data-visualizer", `audio${trackId}`);
+
+  // Set initial content
+  title.textContent = trackData.title;
+  const source = audio.querySelector("source");
+  source.src = trackData.url;
+
+  return track;
+}
+
 // Function to update audio sources for all tracks
 function updateAudioSources(albumNumber) {
   const config = albumConfigs[albumNumber];
@@ -68,29 +99,174 @@ function updateAudioSources(albumNumber) {
     video.load();
   }
 
+  // Clear existing tracks
+  const tracksContainer = document.getElementById("tracks-container");
+  tracksContainer.innerHTML = "";
+
+  // Create new tracks based on the album configuration
+  let trackCount = 0;
+  for (const key in config) {
+    if (key.startsWith("audio")) {
+      trackCount++;
+      const trackElement = createTrackElement(trackCount, config[key]);
+      tracksContainer.appendChild(trackElement);
+    }
+  }
+
+  // Initialize all the new tracks
+  initializeTracks();
+}
+
+// Function to initialize all tracks
+function initializeTracks() {
   document.querySelectorAll("button[data-audio]").forEach((button) => {
     const audioId = button.getAttribute("data-audio");
     const audio = document.getElementById(audioId);
+    const seekBar = document.querySelector(`input[data-seek="${audioId}"]`);
+    const volumeSlider = document.querySelector(
+      `input[data-volume="${audioId}"]`
+    );
+    const timeDisplay = button.parentElement.querySelector(".time-display");
+    const canvas = document.querySelector(
+      `canvas[data-visualizer="${audioId}"]`
+    );
     const trackTitle = document.getElementById(
       `track-title-${audioId.replace("audio", "")}`
     );
 
-    if (config[audioId]) {
-      const source = audio.querySelector("source");
-      source.src = config[audioId].url;
-      trackTitle.textContent = config[audioId].title;
-      audio.load();
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
 
-      // Reset the audio state
-      audio.pause();
-      button.textContent = "▶️";
-      const canvas = document.querySelector(
-        `canvas[data-visualizer="${audioId}"]`
-      );
-      if (canvas) {
-        cancelAnimationFrame(canvas._animationFrame);
+    audio.addEventListener("loadedmetadata", () => {
+      console.log("Audio metadata loaded:", {
+        duration: audio.duration,
+        readyState: audio.readyState,
+        error: audio.error,
+        src: audio.currentSrc,
+      });
+      timeDisplay.textContent = `0:00 / ${formatTime(audio.duration)}`;
+    });
+
+    audio.addEventListener("error", (e) => {
+      console.error("Audio error:", e);
+      console.error("Audio error details:", audio.error);
+      console.error("Audio source:", audio.currentSrc);
+    });
+
+    audio.addEventListener("canplay", () => {
+      console.log("Audio can play now");
+    });
+
+    audio.addEventListener("stalled", () => {
+      console.error("Audio stalled - buffering");
+    });
+
+    button.addEventListener("click", async () => {
+      try {
+        initAudioContext();
+
+        document.querySelectorAll("audio").forEach((other) => {
+          if (other !== audio) {
+            other.pause();
+            const otherBtn = document.querySelector(
+              `button[data-audio="${other.id}"]`
+            );
+            if (otherBtn) otherBtn.textContent = "▶️";
+            const otherCanvas = document.querySelector(
+              `canvas[data-visualizer="${other.id}"]`
+            );
+            if (otherCanvas) cancelAnimationFrame(otherCanvas._animationFrame);
+          }
+        });
+
+        if (!audio._visualizerInitialized) {
+          try {
+            const source = audioContext.createMediaElementSource(audio);
+            const analyser = audioContext.createAnalyser();
+            analyser.fftSize = 128;
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            drawVisualizer(canvas, analyser);
+            audio._source = source;
+            audio._analyser = analyser;
+            audio._visualizerInitialized = true;
+            console.log("Visualizer initialized successfully");
+          } catch (e) {
+            console.error("Error initializing visualizer:", e);
+          }
+        }
+
+        if (audio.paused) {
+          try {
+            await audio.play();
+            button.textContent = "⏸️";
+            console.log("Audio playback started");
+            if (audio._analyser) {
+              drawVisualizer(canvas, audio._analyser);
+            }
+          } catch (e) {
+            console.error("Error starting playback:", e);
+            button.textContent = "❌";
+          }
+        } else {
+          audio.pause();
+          button.textContent = "▶️";
+          cancelAnimationFrame(canvas._animationFrame);
+        }
+      } catch (err) {
+        console.error(`Playback error for ${audioId}:`, err);
+        button.textContent = "❌";
       }
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      if (!isNaN(audio.duration)) {
+        seekBar.value = audio.currentTime;
+        seekBar.max = audio.duration;
+        timeDisplay.textContent = `${formatTime(
+          audio.currentTime
+        )} / ${formatTime(audio.duration)}`;
+      }
+    });
+
+    seekBar.addEventListener("input", () => {
+      audio.currentTime = seekBar.value;
+      timeDisplay.textContent = `${formatTime(
+        audio.currentTime
+      )} / ${formatTime(audio.duration)}`;
+    });
+
+    if (!isiOS) {
+      volumeSlider.addEventListener("input", () => {
+        audio.volume = volumeSlider.value;
+      });
+    } else {
+      volumeSlider.style.display = "none";
+      const notice = document.createElement("div");
+      notice.className = "ios-volume-note";
+      notice.textContent = "Use your device's volume buttons on iOS.";
+      volumeSlider.parentElement.appendChild(notice);
     }
+
+    audio.addEventListener("ended", () => {
+      button.textContent = "▶️";
+      cancelAnimationFrame(canvas._animationFrame);
+
+      // Auto-play next track if available
+      const currentIndex = parseInt(audioId.replace("audio", ""));
+      const nextId = `audio${currentIndex + 1}`;
+      const nextAudio = document.getElementById(nextId);
+      const nextButton = document.querySelector(
+        `button[data-audio="${nextId}"]`
+      );
+
+      if (nextAudio && nextButton) {
+        console.log(`Auto-playing next track: ${nextId}`);
+        setTimeout(() => {
+          nextButton.click();
+        }, 300);
+      }
+    });
   });
 }
 
@@ -102,166 +278,3 @@ document.getElementById("album-select").addEventListener("change", (e) => {
 
 // Initialize with first album
 updateAudioSources(1);
-
-document.querySelectorAll("button[data-audio]").forEach((button) => {
-  const audioId = button.getAttribute("data-audio");
-  const audio = document.getElementById(audioId);
-  const seekBar = document.querySelector(`input[data-seek="${audioId}"]`);
-  const volumeSlider = document.querySelector(
-    `input[data-volume="${audioId}"]`
-  );
-  const timeDisplay = button.parentElement.querySelector(".time-display");
-  const canvas = document.querySelector(`canvas[data-visualizer="${audioId}"]`);
-  const trackTitle = document.getElementById(
-    `track-title-${audioId.replace("audio", "")}`
-  );
-
-  // Set the audio source and title from config
-  if (audioSources[audioId]) {
-    const source = audio.querySelector("source");
-    source.src = audioSources[audioId].url;
-    trackTitle.textContent = audioSources[audioId].title;
-    audio.load(); // Reload the audio element with new source
-  }
-
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-
-  audio.addEventListener("loadedmetadata", () => {
-    console.log("Audio metadata loaded:", {
-      duration: audio.duration,
-      readyState: audio.readyState,
-      error: audio.error,
-      src: audio.currentSrc,
-    });
-    timeDisplay.textContent = `0:00 / ${formatTime(audio.duration)}`;
-  });
-
-  audio.addEventListener("error", (e) => {
-    console.error("Audio error:", e);
-    console.error("Audio error details:", audio.error);
-    console.error("Audio source:", audio.currentSrc);
-  });
-
-  audio.addEventListener("canplay", () => {
-    console.log("Audio can play now");
-  });
-
-  audio.addEventListener("stalled", () => {
-    console.error("Audio stalled - buffering");
-  });
-
-  button.addEventListener("click", async () => {
-    try {
-      initAudioContext();
-
-      document.querySelectorAll("audio").forEach((other) => {
-        if (other !== audio) {
-          other.pause();
-          const otherBtn = document.querySelector(
-            `button[data-audio="${other.id}"]`
-          );
-          if (otherBtn) otherBtn.textContent = "▶️";
-          const otherCanvas = document.querySelector(
-            `canvas[data-visualizer="${other.id}"]`
-          );
-          if (otherCanvas) cancelAnimationFrame(otherCanvas._animationFrame);
-        }
-      });
-
-      if (!audio._visualizerInitialized) {
-        try {
-          const source = audioContext.createMediaElementSource(audio);
-          const analyser = audioContext.createAnalyser();
-          analyser.fftSize = 128;
-          source.connect(analyser);
-          analyser.connect(audioContext.destination);
-          drawVisualizer(canvas, analyser);
-          audio._source = source;
-          audio._analyser = analyser;
-          audio._visualizerInitialized = true;
-          console.log("Visualizer initialized successfully");
-        } catch (e) {
-          console.error("Error initializing visualizer:", e);
-        }
-      }
-
-      if (audio.paused) {
-        try {
-          await audio.play();
-          button.textContent = "⏸️";
-          console.log("Audio playback started");
-          if (audio._analyser) {
-            drawVisualizer(canvas, audio._analyser);
-          }
-        } catch (e) {
-          console.error("Error starting playback:", e);
-          button.textContent = "❌";
-        }
-      } else {
-        audio.pause();
-        button.textContent = "▶️";
-        cancelAnimationFrame(canvas._animationFrame);
-      }
-    } catch (err) {
-      console.error(`Playback error for ${audioId}:`, err);
-      button.textContent = "❌";
-    }
-  });
-
-  // audio.addEventListener("timeupdate", () => {
-  //   seekBar.value = audio.currentTime;
-  //   seekBar.max = audio.duration;
-  //   timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(
-  //     audio.duration
-  //   )}`;
-  // });
-  audio.addEventListener("timeupdate", () => {
-    if (!isNaN(audio.duration)) {
-      seekBar.value = audio.currentTime;
-      seekBar.max = audio.duration;
-      timeDisplay.textContent = `${formatTime(
-        audio.currentTime
-      )} / ${formatTime(audio.duration)}`;
-    }
-  });
-
-  seekBar.addEventListener("input", () => {
-    audio.currentTime = seekBar.value;
-    timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(
-      audio.duration
-    )}`;
-  });
-
-  if (!isiOS) {
-    volumeSlider.addEventListener("input", () => {
-      audio.volume = volumeSlider.value;
-    });
-  } else {
-    volumeSlider.style.display = "none";
-    const notice = document.createElement("div");
-    notice.className = "ios-volume-note";
-    notice.textContent = "Use your device's volume buttons on iOS.";
-    volumeSlider.parentElement.appendChild(notice);
-  }
-
-  audio.addEventListener("ended", () => {
-    button.textContent = "▶️";
-    cancelAnimationFrame(canvas._animationFrame);
-
-    // Auto-play next track if available
-    const currentIndex = parseInt(audioId.replace("audio", ""));
-    const nextId = `audio${currentIndex + 1}`;
-    const nextAudio = document.getElementById(nextId);
-    const nextButton = document.querySelector(`button[data-audio="${nextId}"]`);
-
-    if (nextAudio && nextButton) {
-      console.log(`Auto-playing next track: ${nextId}`);
-
-      // Small delay ensures DOM and audio are ready
-      setTimeout(() => {
-        nextButton.click();
-      }, 300);
-    }
-  });
-});

@@ -3,21 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🎧 Chad's Audio Player 🎧</title>
+    <title>🎧 Git Audio Player 🎧</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-
-
     <video autoplay muted loop playsinline id="background-video">
-      <source src="https://dl.dropboxusercontent.com/scl/fi/2a5ny0rhr6q17sucrwxoq/milesUnderlay.mp4?rlkey=68hi4i3lekcahej9n5k5mj9ol&st=0a2nt7m0" type="video/mp4" />
+      <source
+        src="https://dl.dropboxusercontent.com/scl/fi/2a5ny0rhr6q17sucrwxoq/milesUnderlay.mp4?rlkey=68hi4i3lekcahej9n5k5mj9ol&st=0a2nt7m0"
+        type="video/mp4"
+      />
       Your browser does not support the video tag.
     </video>
 
-
-
     <div class="player-container">
-      <h1>🎧 Miles Davis - Get Up With It 🎧</h1>
+      <h1>🎧 The Audio Player 🎧</h1>
+
+      <div class="album-selector">
+        <label for="album-select">Select Album:</label>
+        <select id="album-select">
+          <option value="1">Get Up With It - Miles Davis</option>
+          <option value="2">Random Good Tunes Volume 1</option>
+          <option value="3">Random Good Tunes Volume 2</option>
+        </select>
+      </div>
 
       <div class="track">
         <h2 id="track-title-1">Loading...</h2>
@@ -242,15 +250,11 @@
           ></canvas>
         </div>
       </div>
-
-
-
-
-
     </div>
 
-
+    <script src="config_1.js"></script>
     <script src="config_2.js"></script>
+    <script src="config_3.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

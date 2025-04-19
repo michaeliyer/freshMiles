@@ -35,21 +35,6 @@ const audioSources = {
     url: "https://dl.dropboxusercontent.com/scl/fi/d9qd9jqgfleo7b7x9w15a/2-04-Billy-Preston.mp3?rlkey=hobd9ij8uk7w8hhkmzp41ef71&st=uucv2vj5&dl=0",
     title: "8. Billy Preston",
   },
-  audio9: {
-    url: "https://dl.dropboxusercontent.com/scl/fi/jejpbih3vusomhb7c4l91/03-Somebody-That-I-Used-to-Know-feat.-Kimbra-feat.-Kimbra.m4a?rlkey=0d9igd934dpk9o41saktgti5o&st=2bb2g1jt&dl=0",
-    title: "9. Somebody that I Used To Know",
-  },
-  audio10: {
-    url: "https://dl.dropboxusercontent.com/scl/fi/a1lxqvx3wd6pbkqtjohix/2-02-Red-China-Blues.m4a?rlkey=nz7z4s1n4pmpcl24sy9w7mj3c&st=cpbkg6x9&dl=0",
-    title: "10. Red China Blues",
-  },
-  audio11: {
-    url: "https://dl.dropboxusercontent.com/scl/fi/cgmoynoplm6dsqq2tq3gd/2-03-Mtume.mp3?rlkey=oeyrd038i0jc1goymff53sy2r&st=zeirpm22&dl=0",
-    title: "11. Mtume",
-  },
-  audio12: {
-    url: "https://dl.dropboxusercontent.com/scl/fi/d9qd9jqgfleo7b7x9w15a/2-04-Billy-Preston.mp3?rlkey=hobd9ij8uk7w8hhkmzp41ef71&st=uucv2vj5&dl=0",
-    title: "12. Billy Preston",
-  },
+
   // Add more tracks here as needed
 };

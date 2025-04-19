@@ -24,6 +24,12 @@
         </select>
       </div>
 
+      <div class="repeat-control">
+        <label for="repeat-count">Repeat Count:</label>
+        <input type="number" id="repeat-count" min="0" value="0" />
+        <span class="repeat-info">(0 = no repeat, 1 = play twice, etc.)</span>
+      </div>
+
       <div id="tracks-container">
         <!-- Tracks will be dynamically added here -->
       </div>
@@ -32,10 +38,21 @@
       <template id="track-template">
         <div class="track">
           <h2 class="track-title">Loading...</h2>
-          <audio preload="metadata" crossorigin="anonymous">
-            <source type="audio/mpeg" />
-            Your browser does not support the audio element.
-          </audio>
+          <div class="track-controls">
+            <div class="repeat-control">
+              <label>Repeats:</label>
+              <input
+                type="number"
+                class="track-repeat-count"
+                min="0"
+                value="0"
+              />
+            </div>
+            <audio preload="metadata" crossorigin="anonymous">
+              <source type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
           <div class="controls">
             <button class="play-button">▶️</button>
             <div class="time-wrapper">

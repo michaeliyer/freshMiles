@@ -1,67 +1,110 @@
 body {
-    margin: 0;
-    padding: 2rem;
-    font-family: sans-serif;
-    /* background: #111; */
-    background: none;
-    color: #fff;
-  }
-  
-  
-  #background-video {
-    position: fixed;
-    top: 0;
-    left: 0;
-    min-width: 100vw;
-    min-height: 100vh;
-    z-index: -1;
-    object-fit: cover;
-    filter: brightness(0.3) blur(3px);
-  }
-  
-  .player-container {
-    position: relative;
-    left: 40%;
-    max-width: 300px;
-    margin: auto;
-    padding: 1rem;
-    /* background: #222; */
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  }
-  
-  .track {
-    margin-bottom: 2rem;
-  }
-  
-  .controls {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .time-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: monospace;
-    font-size: 0.9rem;
-  }
-  
-  canvas.visualizer {
-    width: 100%;
-    height: 40px;
-    background: #000;
-    border-radius: 5px;
-  }
-  
-  .ios-volume-note {
-    font-size: 0.85rem;
-    color: #ccc;
-  }
-  
-  
-  
-  
-  
+  margin: 0;
+  padding: 2rem;
+  font-family: sans-serif;
+  /* background: #111; */
+  background: none;
+  color: #fff;
+}
+
+#background-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  z-index: -1;
+  object-fit: cover;
+  filter: brightness(0.3) blur(3px);
+}
+
+.player-container {
+  position: relative;
+  left: 40%;
+  max-width: 300px;
+  margin: auto;
+  padding: 1rem;
+  /* background: #222; */
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.track {
+  margin-bottom: 2rem;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.time-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+canvas.visualizer {
+  width: 100%;
+  height: 40px;
+  background: #000;
+  border-radius: 5px;
+}
+
+.ios-volume-note {
+  font-size: 0.85rem;
+  color: #ccc;
+}
+
+.repeat-control {
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.repeat-control input[type="number"] {
+  width: 60px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.repeat-info {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.track-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.track-controls .repeat-control {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.track-controls .repeat-control input[type="number"] {
+  width: 50px;
+  padding: 0.25rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.track-controls .repeat-control label {
+  font-size: 0.9rem;
+  color: #ccc;
+}

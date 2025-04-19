@@ -68,6 +68,7 @@ function createTrackElement(trackId, trackData) {
   const volumeSlider = trackElement.querySelector(".volume-slider");
   const timeDisplay = trackElement.querySelector(".time-display");
   const canvas = trackElement.querySelector(".visualizer");
+  const repeatInput = trackElement.querySelector(".track-repeat-count");
 
   // Set IDs and data attributes
   audio.id = `audio${trackId}`;
@@ -76,6 +77,7 @@ function createTrackElement(trackId, trackData) {
   seekBar.setAttribute("data-seek", `audio${trackId}`);
   volumeSlider.setAttribute("data-volume", `audio${trackId}`);
   canvas.setAttribute("data-visualizer", `audio${trackId}`);
+  repeatInput.setAttribute("data-repeat", `audio${trackId}`);
 
   // Set initial content
   title.textContent = trackData.title;
@@ -119,6 +121,9 @@ function updateAudioSources(albumNumber) {
 
 // Function to initialize all tracks
 function initializeTracks() {
+  let currentTrack = null;
+  let repeatCounts = new Map(); // Track repeat counts for each audio element
+
   document.querySelectorAll("button[data-audio]").forEach((button) => {
     const audioId = button.getAttribute("data-audio");
     const audio = document.getElementById(audioId);
@@ -133,6 +138,23 @@ function initializeTracks() {
     const trackTitle = document.getElementById(
       `track-title-${audioId.replace("audio", "")}`
     );
+    const repeatInput = document.querySelector(
+      `input[data-repeat="${audioId}"]`
+    );
+
+    // Initialize repeat count for this track
+    if (!repeatCounts.has(audioId)) {
+      repeatCounts.set(audioId, 0);
+    }
+
+    // Update repeat count when user changes the input
+    repeatInput.addEventListener("change", () => {
+      const newCount = parseInt(repeatInput.value) || 0;
+      repeatCounts.set(audioId, newCount); // Set to the new count
+    });
+
+    // Initialize with current value
+    repeatCounts.set(audioId, parseInt(repeatInput.value) || 0);
 
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
@@ -164,6 +186,12 @@ function initializeTracks() {
     button.addEventListener("click", async () => {
       try {
         initAudioContext();
+
+        // If this is a different track than the current one, reset repeat count
+        if (currentTrack !== audioId) {
+          repeatCounts.set(audioId, parseInt(repeatInput.value) || 0);
+          currentTrack = audioId;
+        }
 
         document.querySelectorAll("audio").forEach((other) => {
           if (other !== audio) {
@@ -249,22 +277,58 @@ function initializeTracks() {
     }
 
     audio.addEventListener("ended", () => {
-      button.textContent = "▶️";
-      cancelAnimationFrame(canvas._animationFrame);
+      const currentRepeatCount = repeatCounts.get(audioId) || 0;
 
-      // Auto-play next track if available
-      const currentIndex = parseInt(audioId.replace("audio", ""));
-      const nextId = `audio${currentIndex + 1}`;
-      const nextAudio = document.getElementById(nextId);
-      const nextButton = document.querySelector(
-        `button[data-audio="${nextId}"]`
-      );
+      if (currentRepeatCount > 0) {
+        // Decrement repeat count and play again
+        const newCount = currentRepeatCount - 1;
+        repeatCounts.set(audioId, newCount);
+        repeatInput.value = newCount; // Update the UI input value
+        audio.currentTime = 0;
+        audio.play();
+      } else {
+        // Move to next track
+        button.textContent = "▶️";
+        cancelAnimationFrame(canvas._animationFrame);
+        const initialRepeatCount = parseInt(repeatInput.value) || 0;
+        repeatCounts.set(audioId, initialRepeatCount);
+        repeatInput.value = initialRepeatCount; // Reset the UI input value
 
-      if (nextAudio && nextButton) {
-        console.log(`Auto-playing next track: ${nextId}`);
-        setTimeout(() => {
-          nextButton.click();
-        }, 300);
+        // Get all tracks in the current album
+        const tracks = Array.from(document.querySelectorAll("audio")).sort(
+          (a, b) => {
+            return (
+              parseInt(a.id.replace("audio", "")) -
+              parseInt(b.id.replace("audio", ""))
+            );
+          }
+        );
+
+        // Find the current track's index
+        const currentIndex = tracks.findIndex((track) => track.id === audioId);
+
+        // Determine the next track
+        let nextTrack;
+        if (currentIndex === tracks.length - 1) {
+          // If this is the last track, go back to the first track
+          nextTrack = tracks[0];
+        } else {
+          // Otherwise, go to the next track
+          nextTrack = tracks[currentIndex + 1];
+        }
+
+        // Play the next track
+        if (nextTrack) {
+          const nextButton = document.querySelector(
+            `button[data-audio="${nextTrack.id}"]`
+          );
+          if (nextButton) {
+            console.log(`Auto-playing next track: ${nextTrack.id}`);
+            setTimeout(() => {
+              nextButton.click();
+            }, 100);
+          }
+        }
       }
     });
   });

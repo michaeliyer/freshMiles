@@ -1,6 +1,10 @@
 const audioSources2 = {
+  // backgroundVideo: {
+  //   url: "https://dl.dropboxusercontent.com/scl/fi/h2ugxfl81c9joovtkmuhr/joshUnderLay.mp4?rlkey=bgzknq0on6vgxsp8lrfrff6jg&st=s2trwsvm&dl=0",
+  //   type: "video/mp4",
+  // },
   backgroundVideo: {
-    url: "https://dl.dropboxusercontent.com/scl/fi/h2ugxfl81c9joovtkmuhr/joshUnderLay.mp4?rlkey=bgzknq0on6vgxsp8lrfrff6jg&st=s2trwsvm&dl=0",
+    url: "https://dl.dropboxusercontent.com/scl/fi/yrmhxdyz6esf7q14vvlwf/BlueTangoJosh.mp4?rlkey=r3lcqai6baa7ezfyal6bm7n4a&st=qwpgvmvi&dl=0",
     type: "video/mp4",
   },
   audio1: {
@@ -34,6 +38,10 @@ const audioSources2 = {
   audio8: {
     url: "https://dl.dropboxusercontent.com/scl/fi/h46gcbf04xjll4jeitqvs/01-In-The-Meantime.m4a?rlkey=t27sl3n62b977nh6ofeedf4m8&st=bf8c6mpq&dl=0",
     title: "8. In The Meantime",
+  },
+  audio9: {
+    url: "https://dl.dropboxusercontent.com/scl/fi/wyq3ugojloqsa0zmw1fwh/letsGetSmall-allTracks.mp3?rlkey=fh4z5x0mshvx07sz49eeioctu&st=5d97f6ey&dl=0",
+    title: "8. Let's Get Small",
   },
   // Add more tracks here as needed
 };

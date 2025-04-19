@@ -19,6 +19,10 @@ const audioSources3 = {
     url: "https://dl.dropboxusercontent.com/scl/fi/wnpm3vswe6wjvcp1p8vbh/theWiggles_HeadShouldersKneesToes.mp3?rlkey=o6y1hakentgh4qmm1z5egrjne&st=hxsjbqx6&dl=0",
     title: "3. The Wiggles: Head, Shoulders, Knees and Toes",
   },
+  audio4: {
+    url: "https://dl.dropboxusercontent.com/scl/fi/50rea47hz33j8a7qim53w/JoniMitchell_Big-YellowTaxi.mp3?rlkey=tfigt42hgxkh91psw8oussovb&st=ijuap5wf&dl=0",
+    title: "4. Joanie Mitchell: Big Yellow Taxi",
+  },
 
   // Add more tracks here as needed
 };

@@ -18,7 +18,8 @@ body {
   scale: 1;
   z-index: -1;
   object-fit: cover;
-  filter: brightness(0.3) blur(3px);
+  /* filter: brightness(0.3) blur(3px); */
+  filter: brightness(0.45) blur(2px);
 }
 
 .player-container {

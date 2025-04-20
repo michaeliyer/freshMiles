@@ -20,12 +20,12 @@ const audioSources4 = {
       title: "4. Vance Joy: Riptide",
     },
     audio5: {
-      url: "https://dl.dropboxusercontent.com/scl/fi/wyq3ugojloqsa0zmw1fwh/letsGetSmall-allTracks.mp3?rlkey=fh4z5x0mshvx07sz49eeioctu&st=x4qqktzg&dl=0",
-      title: "5. Steve Martin: Let's Get Small",
+      url: "https://dl.dropboxusercontent.com/",
+      title: "5. ",
     },
     audio6: {
-      url: "https://dl.dropboxusercontent.com/scl/fi/zwsbq4bv9frp4g7itclsf/deliriousEddie.mp3?rlkey=t4wy1vbw1rn0qinyd7vq99vug&st=tqg227gp&dl=0",
-      title: "6. Eddie Murphy: Delirious",
+      url: "https://dl.dropboxusercontent.com/",
+      title: "6. ",
     },
     audio7: {
       url: "https://dl.dropboxusercontent.com/",

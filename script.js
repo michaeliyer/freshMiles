@@ -53,6 +53,7 @@ const albumConfigs = {
   2: audioSources2, // config_2.js
   3: audioSources3, // config_3.js
   4: audioSources4, // config_3.js
+  5: audioSources5, // config_3.js
 };
 
 // Function to create a new track element

@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Git Audio Player" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <title>🎧 Git Audio Player 🎧</title>
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -22,7 +29,7 @@
           <option value="2">Random Good Tunes Volume 1</option>
           <option value="3">Franky Business</option>
           <option value="4">🔪 Killer Tunes 🔪</option>
-          <option value="5"> Comedy Stuff </option>
+          <option value="5">Comedy Stuff</option>
         </select>
       </div>
 
@@ -44,7 +51,13 @@
                 value="0"
               />
             </div>
-            <audio preload="metadata" crossorigin="anonymous">
+            <audio
+              preload="metadata"
+              crossorigin="anonymous"
+              playsinline
+              webkit-playsinline
+              x-webkit-airplay="allow"
+            >
               <source type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>

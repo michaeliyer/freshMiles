@@ -23,6 +23,11 @@ const audioSources3 = {
     url: "https://dl.dropboxusercontent.com/scl/fi/50rea47hz33j8a7qim53w/JoniMitchell_Big-YellowTaxi.mp3?rlkey=tfigt42hgxkh91psw8oussovb&st=ijuap5wf&dl=0",
     title: "4. Joanie Mitchell: Big Yellow Taxi",
   },
+  audio5: {
+    url: "https://dl.dropboxusercontent.com/scl/fi/k4aif8wcfmu7q8z9lcv7c/01-Dancing-Queen.mp3?rlkey=svtlh11umydckyx0tplc5dkst&st=irii45da&dl=0",
+
+    title: "5. ABBA: Dancing Queen",
+  },
 
   // Add more tracks here as needed
 };

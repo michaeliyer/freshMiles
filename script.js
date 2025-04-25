@@ -5,15 +5,41 @@ function formatTime(seconds) {
 }
 
 let audioContext;
+let analyser;
+let dataArray;
+let isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
 function initAudioContext() {
   if (!audioContext) {
-    try {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      console.log("AudioContext initialized successfully");
-    } catch (e) {
-      console.error("Error initializing AudioContext:", e);
-    }
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
   }
+}
+
+// iOS-specific audio handling
+if (isiOS) {
+  // Resume audio context on user interaction
+  document.addEventListener(
+    "touchstart",
+    function () {
+      if (audioContext && audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+    },
+    { once: true }
+  );
+
+  // Handle page visibility changes
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      // Page is hidden, ensure audio continues playing
+      if (audioContext && audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+    }
+  });
 }
 
 function drawVisualizer(canvas, analyser) {
@@ -42,10 +68,6 @@ function drawVisualizer(canvas, analyser) {
 
   draw();
 }
-
-const isiOS =
-  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-  (navigator.userAgent.includes("Macintosh") && "ontouchend" in document);
 
 // Store all album configurations
 const albumConfigs = {
@@ -344,3 +366,35 @@ document.getElementById("album-select").addEventListener("change", (e) => {
 
 // Initialize with first album
 updateAudioSources(1);
+
+// Modify the playTrack function to handle iOS background playback
+function playTrack(trackNumber) {
+  if (currentTrack === trackNumber) {
+    if (audio.paused) {
+      audio.play().catch((error) => {
+        console.error("Error playing audio:", error);
+        if (isiOS) {
+          // On iOS, we need to resume the audio context
+          if (audioContext && audioContext.state === "suspended") {
+            audioContext.resume();
+          }
+        }
+      });
+    } else {
+      audio.pause();
+    }
+  } else {
+    currentTrack = trackNumber;
+    const source = albumConfigs[currentAlbum][trackNumber];
+    audio.src = source;
+    audio.play().catch((error) => {
+      console.error("Error playing audio:", error);
+      if (isiOS) {
+        // On iOS, we need to resume the audio context
+        if (audioContext && audioContext.state === "suspended") {
+          audioContext.resume();
+        }
+      }
+    });
+  }
+}
